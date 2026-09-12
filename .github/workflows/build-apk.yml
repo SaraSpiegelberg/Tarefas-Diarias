@@ -24,10 +24,11 @@ jobs:
       - name: Build APK (imagem Docker oficial do Buildozer)
         run: |
           docker run -i --rm \
+            --entrypoint bash \
             -v "${{ github.workspace }}":/workspace \
             -w /workspace/mobile \
             ghcr.io/kivy/buildozer:latest \
-            bash -c "yes | buildozer -v android debug"
+            -c "yes | /home/user/.venv/bin/buildozer -v android debug"
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
