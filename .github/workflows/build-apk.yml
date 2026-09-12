@@ -1,8 +1,8 @@
 # Build do APK Tarefas Diárias via GitHub Actions
 #
-# Usa a action oficial ArtemSBulgakov/buildozer-action, que roda na imagem
-# Docker oficial do Buildozer (kivy/buildozer) com todas as dependências de
-# sistema corretas — evita o erro do libffi em Ubuntu 24.04.
+# Usa a imagem Docker oficial do Buildozer (ghcr.io/kivy/buildozer:latest),
+# que já vem pronta com JDK e todas as dependências corretas.
+# Nada de action de terceiros (a ArtemSBulgakov quebrava num PPA removido).
 #
 # Depois do push, o APK fica em Actions > "Build APK" > aba "Artifacts".
 # Também dá pra rodar manualmente: Actions > Build APK > Run workflow.
@@ -21,12 +21,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Build APK with Buildozer (Docker oficial)
-        uses: ArtemSBulgakov/buildozer-action@v1
-        id: buildozer
-        with:
-          workdir: mobile
-          buildozer_version: stable
+      - name: Build APK (imagem Docker oficial do Buildozer)
+        run: |
+          docker run --rm \
+            -v "${{ github.workspace }}":/workspace \
+            -w /workspace/mobile \
+            ghcr.io/kivy/buildozer:latest \
+            buildozer -v android debug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
