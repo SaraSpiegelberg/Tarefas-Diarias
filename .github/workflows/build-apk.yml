@@ -37,8 +37,21 @@ jobs:
       - name: Install Buildozer
         run: pip install buildozer cython
 
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Accept Android SDK licenses
+        run: |
+          SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          if [ ! -x "$SDKMANAGER" ]; then
+            SDKMANAGER="$ANDROID_HOME/tools/bin/sdkmanager"
+          fi
+          yes | "$SDKMANAGER" --licenses >/dev/null 2>&1 || true
+
       - name: Build APK (debug)
         working-directory: mobile
+        env:
+          ANDROIDSDK: $ANDROID_HOME
         run: buildozer -v android debug
 
       - name: Upload APK
