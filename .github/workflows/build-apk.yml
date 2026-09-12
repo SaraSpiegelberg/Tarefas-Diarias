@@ -23,7 +23,7 @@ jobs:
 
       - name: Build APK (imagem Docker oficial do Buildozer)
         run: |
-          docker run --rm \
+          docker run -i --rm \
             -v "${{ github.workspace }}":/workspace \
             -w /workspace/mobile \
             ghcr.io/kivy/buildozer:latest \
