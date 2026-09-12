@@ -1,0 +1,49 @@
+# Build do APK Tarefas Diárias via GitHub Actions (sem precisar de Linux local)
+#
+# Depois de pushar este arquivo, o APK é gerado automaticamente na aba "Actions"
+# > "Build APK" > aba "Artifacts": download de "TarefasDiarias-apk".
+#
+# Também dá pra rodar manualmente: Actions > Build APK > Run workflow.
+
+name: Build APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential git zip unzip \
+            openjdk-17-jdk python3-pip \
+            autoconf libtool pkg-config \
+            zlib1g-dev libncurses-dev libffi-dev libssl-dev \
+            curl cmake
+
+      - name: Install Buildozer
+        run: pip install buildozer cython
+
+      - name: Build APK (debug)
+        working-directory: mobile
+        run: buildozer -v android debug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: TarefasDiarias-apk
+          path: mobile/bin/*.apk
+          if-no-files-found: error

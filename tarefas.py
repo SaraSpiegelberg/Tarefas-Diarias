@@ -35,6 +35,13 @@ ASSETS = os.path.join(APPDIR, "assets")
 ICONE = os.path.join(ASSETS, "app.ico")
 
 # ---------------------------------------------------------------------------
+# Versão do app (exibida no HUD)
+# ---------------------------------------------------------------------------
+VERSAO = "1.1.0"
+VERSAO_DATA = "2026-09-12"
+VERSAO_LABEL = "v%s · %s" % (VERSAO, VERSAO_DATA)
+
+# ---------------------------------------------------------------------------
 # Paleta Pastel XP kawaii (inspirada na estetica.txt do PC Sara)
 # ---------------------------------------------------------------------------
 BG = "#FDF6F2"          # rosa clarinho (fundo)
@@ -277,6 +284,12 @@ class TarefasApp:
             foreground=TITLEBAR_TEXT, font=(FONTE, 9),
         )
         self.lbl_data.pack(side="right", padx=10, pady=3)
+
+        self.lbl_versao = ttk.Label(
+            barra, text=VERSAO_LABEL, background=TITLEBAR,
+            foreground=TITLEBAR_TEXT, font=(FONTE, 8),
+        )
+        self.lbl_versao.pack(side="right", padx=(0, 10), pady=3)
 
         # Bandeirinha pastel (como no Mini PC XP)
         faixa = tk.Frame(self.root, height=6)
@@ -760,7 +773,7 @@ class TarefasApp:
         editor_wrap.pack(fill="x", pady=(0, 6))
 
         self.txt_livre = tk.Text(
-            editor_wrap, font=(FONTE, 10), bg=PANEL, fg=TEXT, relief="flat",
+            editor_wrap, font=(FONTE, 10), bg="#FFFFFF", fg=TEXT, relief="flat",
             wrap="word", undo=True, padx=10, pady=8, height=8,
         )
         sb = ttk.Scrollbar(editor_wrap, orient="vertical", command=self.txt_livre.yview)
@@ -854,28 +867,33 @@ class TarefasApp:
                 pass
         self._pv_job = self.root.after(350, self._preview_texto)
 
+    @staticmethod
+    def _largura_visual(s, tabstop=4):
+        # largura em colunas de fonte monoespaçada; tab avança até o próximo tabstop
+        w = 0
+        for ch in s:
+            if ch == "\t":
+                w += tabstop - (w % tabstop)
+            else:
+                w += 1
+        return w
+
     def _quebrar_linhas(self, texto, colunas):
         limite = int(colunas)
+        tabstop = 4
         saida = []
         for par in texto.split("\n"):
-            palavras = par.split()
-            if not palavras:
-                saida.append("")
-                continue
             atual = ""
-            for p in palavras:
-                while len(p) > limite:
-                    if atual:
-                        saida.append(atual)
-                        atual = ""
-                    saida.append(p[:limite])
-                    p = p[limite:]
-                comp = p if not atual else atual + " " + p
-                if len(comp) <= limite:
-                    atual = comp
-                else:
+            for ch in par:
+                add = tabstop - (self._largura_visual(atual, tabstop) % tabstop) if ch == "\t" else 1
+                if atual and self._largura_visual(atual, tabstop) + add > limite:
                     saida.append(atual)
-                    atual = p
+                    atual = ""
+                if ch == "\t":
+                    add = tabstop - (self._largura_visual(atual, tabstop) % tabstop)
+                    atual += " " * add  # expande o tab em espaços (fonte monoespaçada)
+                else:
+                    atual += ch
             saida.append(atual)
         while saida and saida[-1] == "":
             saida.pop()
