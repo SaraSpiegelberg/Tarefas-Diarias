@@ -32,8 +32,7 @@ jobs:
             openjdk-17-jdk python3-pip \
             autoconf libtool pkg-config \
             zlib1g-dev libncurses-dev libffi-dev libssl-dev \
-            libtinfo5 patch curl cmake \
-            wget file
+            patch curl cmake wget file
 
       - name: Install Buildozer
         run: pip install buildozer cython
