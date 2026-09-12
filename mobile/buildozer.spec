@@ -38,7 +38,9 @@ icon.filename = assets/icon.png
 # BLUETOOTH/BLUETOOTH_CONNECT.
 android.permissions =
 android.accept_sdk_license = True
-android.api = 33
+# api 31 é o padrão compatível com o buildozer stable (p4a 2023+).
+# Para publicar no Google Play seria preciso 33+; para uso pessoal 31 instala normal.
+android.api = 31
 android.minapi = 21
 
 android.allow_backup = True

@@ -1,8 +1,10 @@
-# Build do APK Tarefas Diárias via GitHub Actions (sem precisar de Linux local)
+# Build do APK Tarefas Diárias via GitHub Actions
 #
-# Depois de pushar este arquivo, o APK é gerado automaticamente na aba "Actions"
-# > "Build APK" > aba "Artifacts": download de "TarefasDiarias-apk".
+# Usa a action oficial ArtemSBulgakov/buildozer-action, que roda na imagem
+# Docker oficial do Buildozer (kivy/buildozer) com todas as dependências de
+# sistema corretas — evita o erro do libffi em Ubuntu 24.04.
 #
+# Depois do push, o APK fica em Actions > "Build APK" > aba "Artifacts".
 # Também dá pra rodar manualmente: Actions > Build APK > Run workflow.
 
 name: Build APK
@@ -19,46 +21,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Build APK with Buildozer (Docker oficial)
+        uses: ArtemSBulgakov/buildozer-action@v1
+        id: buildozer
         with:
-          python-version: '3.11'
-
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            build-essential git zip unzip \
-            openjdk-17-jdk python3-pip \
-            autoconf libtool pkg-config \
-            zlib1g-dev libncurses-dev libffi-dev libssl-dev \
-            patch curl cmake wget file
-
-      - name: Install Buildozer
-        run: pip install buildozer cython
-
-      - name: Cache buildozer (SDK/NDK)
-        uses: actions/cache@v4
-        with:
-          path: ~/.buildozer
-          key: buildozer-${{ runner.os }}-${{ hashFiles('mobile/buildozer.spec') }}
-
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Accept Android SDK licenses
-        run: |
-          SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
-          if [ ! -x "$SDKMANAGER" ]; then
-            SDKMANAGER="$ANDROID_HOME/tools/bin/sdkmanager"
-          fi
-          yes | "$SDKMANAGER" --licenses >/dev/null 2>&1 || true
-
-      - name: Build APK (debug)
-        working-directory: mobile
-        env:
-          ANDROIDSDK: $ANDROID_HOME
-        run: buildozer -v android debug
+          workdir: mobile
+          buildozer_version: stable
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
