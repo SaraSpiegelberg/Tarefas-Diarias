@@ -32,10 +32,17 @@ jobs:
             openjdk-17-jdk python3-pip \
             autoconf libtool pkg-config \
             zlib1g-dev libncurses-dev libffi-dev libssl-dev \
-            curl cmake
+            libtinfo5 patch curl cmake \
+            wget file
 
       - name: Install Buildozer
         run: pip install buildozer cython
+
+      - name: Cache buildozer (SDK/NDK)
+        uses: actions/cache@v4
+        with:
+          path: ~/.buildozer
+          key: buildozer-${{ runner.os }}-${{ hashFiles('mobile/buildozer.spec') }}
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3

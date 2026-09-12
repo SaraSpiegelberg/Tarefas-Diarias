@@ -20,16 +20,16 @@ source.include_exts = py,png,jpg,kv,atlas,ttf
 
 version = 1.1.0
 
-requirements = python3,kivy==3.0.0,kivymd,plyer
+requirements = python3,kivymd,plyer
 
 orientation = portrait
 fullscreen = 0
 
-# ícone do app (relativo ao buildozer.spec, sobe um nível até assets do projeto)
-icon.filename = ../assets/app.png
+# ícone do app (dentro do source.dir — obrigatório para o buildozer)
+icon.filename = assets/icon.png
 
 # presplash (tela de carregamento) — opcional
-#presplash.filename = ../assets/app.png
+#presplash.filename = assets/icon.png
 
 # Permissões: nenhuma obrigatória por enquanto (o app NÃO usa internet).
 # O importar/exportar usa o seletor de arquivos do Android (SAF) e não pede
@@ -37,6 +37,7 @@ icon.filename = ../assets/app.png
 # A impressão SC03 via Bluetooth será um passo futuro -> aí entram as permissões
 # BLUETOOTH/BLUETOOTH_CONNECT.
 android.permissions =
+android.accept_sdk_license = True
 android.api = 33
 android.minapi = 21
 
